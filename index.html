@@ -1,0 +1,32 @@
+<!doctype html>
+<style type=text/css>
+#urlbar {
+  width: 93%;
+}
+#go {
+  width: 5%;
+}
+</style>
+<input type=text id=urlbar>
+<input type=button value=go onclick=go()>
+<script>
+function b64safe(s) {
+  return btoa(
+    encodeURIComponent(s)
+    .replace(/%([0-9A-F]{2})/g, function(match, p1) {
+      return String.fromCharCode('0x' + p1)
+    })
+  );
+
+}
+function go(s) {
+  if (s) {
+    var url = s;
+  } else {
+    var url = document.querySelector('#urlbar').value
+  }
+  location = b64safe(url)
+}
+</script>
+<a href="javascript:go('http://www.google.com/');">Google</a>
+

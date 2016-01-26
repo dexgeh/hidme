@@ -1,0 +1,16 @@
+{
+  "name": "hidme",
+  "version": "0.0.1",
+  "author": "dexgeh",
+  "dependencies": {
+    "coffee-script": "^1.10.0",
+    "domutils": "^1.5.1",
+    "htmlparser2": "^3.9.0",
+    "tough-cookie": "^2.2.1",
+    "valid-url": "^1.0.9"
+  },
+  "scripts": {
+    "start": "./server.coffee",
+    "echo": "./echo.coffee"
+  }
+}
