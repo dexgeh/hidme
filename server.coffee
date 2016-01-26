@@ -166,6 +166,7 @@ filterRequestHeaders = (req, resource) ->
   cookies = req.session.cookieJar.getCookiesSync resource
   if cookies.length > 0
     headers['cookie'] = cookies.join '; '
+    TRACE "got cookies in jar: ", headers['cookie']
   headers
 
 filterResponseHeaders = (req, clres, resource) ->
@@ -261,7 +262,6 @@ proxyRequest = (req, res) ->
         body = Buffer.concat chunks
         mangleBody body, resource, (error, body) ->
           return res.error error if error
-          TRACE "got body to serve"
           res.writeHead clres.statusCode, headers
           res.end body
     else
