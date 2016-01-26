@@ -13,7 +13,7 @@ _hidme_injection.b64safe = function(s) {
 _hidme_injection.XHR_constructor =  XMLHttpRequest.prototype.constructor;
 XMLHttpRequest.prototype.constructor = function() {
   var url = arguments[1];
-  url = '/proxy?url=' + _hidme_injection.b64safe(url);
+  url = _hidme_injection.b64safe(url);
   var args = Array.prototype.slice.call(arguments);
   args[1] = url;
   _hidme_injection.XHR_constructor.apply(null, args);

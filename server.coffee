@@ -183,6 +183,10 @@ filterResponseHeaders = (req, clres, resource) ->
           req.session.cookieJar.setCookieSync s, resource
     else
       headers[k] = v
+  # some security headers to avoid leaking from the user-agent
+  headers['X-Content-Type-Options'] = 'nosniff' # no IE sniffing please
+  headers['X-XSS-Protection'] = '1; mode=block'
+  headers['X-Frame-Options'] = 'SAMEORIGIN'
   headers
 
 isHtml = (headers) ->
@@ -210,7 +214,6 @@ mangleBody = (body, resource, callback) ->
     body = "#{fixedInjection}#{body}"
   parser = new htmlparser2.Parser new htmlparser2.DomHandler (error, dom) ->
     return callback error if error
-    TRACE "parsed, working with dom"
     domutils.find (elem) ->
       if elem.type is 'tag'
           for e,i in attributesToMangle by 2
