@@ -10,6 +10,7 @@ tough = require 'tough-cookie'
 validator = require 'valid-url'
 htmlparser2 = require 'htmlparser2'
 domutils = require 'domutils'
+CoffeeScript = require 'coffee-script'
 
 config =
   session:
@@ -107,14 +108,14 @@ class SessionManager
         res.error error
       else if session
         req.session = session
-        withSession session, -> callback()
+        withSession session, callback
       else
         @create (error, session) ->
           if error
             res.error error
           else
             req.session = session
-            withSession session, -> callback()
+            withSession session, callback
 
 # in-memory session manager
 
@@ -142,10 +143,12 @@ sessionManager = new InMemorySessionManager
 # utils
 
 printRequestMetaData = (method, url, headers) ->
-  TRACE "#{method} #{url}\n".concat ("#{k}: #{v}\n" for k,v of headers).join ""
+  TRACE "#{method} #{url}\n".concat (
+    "#{k}: #{v}\n" for k,v of headers).join ""
 
 printResponseMetaData = (statusCode, headers) ->
-  TRACE "Status code: #{statusCode}\n".concat ("#{k}: #{v}\n" for k,v of headers).join ""
+  TRACE "Status code: #{statusCode}\n".concat (
+    "#{k}: #{v}\n" for k,v of headers).join ""
 
 # proxy logic
 
@@ -193,7 +196,8 @@ filterResponseHeaders = (req, clres, resource) ->
 isHtml = (headers) ->
   headers['content-type'] and 0 == headers['content-type'].indexOf 'text/html'
 
-fixedInjection = fs.readFileSync 'inject.html', 'utf8'
+jsInjection = CoffeeScript.compile fs.readFileSync 'inject.coffee', 'utf8'
+fixedInjection = "<script>#{jsInjection}</script>"
 fixedInjectionWithLeadingHead = "<head>#{fixedInjection}"
 
 attributesToMangle = [
@@ -224,7 +228,8 @@ mangleBody = (body, resource, callback) ->
               link = url.resolve resource, elem.attribs[attr]
               elem.attribs[attr] = new Buffer(link).toString 'base64'
               return no
-      no # do not collect anything from the loop, it is modifying the dom
+      no # do not collect anything from the loop
+         # we are manipulating the dom
     , dom, yes
     body = domutils.getOuterHTML dom
     callback null, body
@@ -269,7 +274,7 @@ proxyRequest = (req, res) ->
       clres.on 'data', res.write.bind res
       clres.on 'ebd', res.end.bind res
     clreq.on 'error', res.error.bind res
-  req.on 'data', (chunk) -> clreq.write chunk
+  req.on 'data', clreq.write.bind clreq
   req.on 'end', clreq.end.bind clreq
 
 # server and routing
