@@ -272,7 +272,7 @@ proxyRequest = (req, res) ->
     else
       res.writeHead clres.statusCode, headers
       clres.on 'data', res.write.bind res
-      clres.on 'ebd', res.end.bind res
+      clres.on 'end', res.end.bind res
     clreq.on 'error', res.error.bind res
   req.on 'data', clreq.write.bind clreq
   req.on 'end', clreq.end.bind clreq
