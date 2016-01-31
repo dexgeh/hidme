@@ -206,6 +206,14 @@ attributesToMangle = [
   'link','href'
   'script','src'
   'form','action'
+  'audio','src'
+  'video','src'
+  'iframe','src'
+  'object','data'
+  'embed','src'
+  'html','manifest'
+  'applet','jnlp_href'
+  'applet','archive'
 ]
 
 mangleBody = (body, resource, callback) ->
